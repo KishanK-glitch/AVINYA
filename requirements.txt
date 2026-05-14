@@ -1,0 +1,37 @@
+# -------------------------------------------------------
+# Qiti Backend – Python dependencies
+# -------------------------------------------------------
+
+# Web framework
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# WebSocket support (bundled with fastapi/starlette, listed for clarity)
+websockets>=12.0
+
+# Settings
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+
+# MongoDB (async)
+motor>=3.4.0
+pymongo>=4.7.0
+
+# Qdrant vector DB
+qdrant-client>=1.9.0
+
+# HTTP client (used internally by qdrant-client & llm SDKs)
+httpx>=0.27.0
+
+# -------------------------------------------------------
+# Optional LLM clients (uncomment as needed)
+# -------------------------------------------------------
+# openai>=1.30.0
+# google-generativeai>=0.5.0
+# langchain>=0.2.0
+# langgraph>=0.0.55
+
+# -------------------------------------------------------
+# Dev / testing
+# -------------------------------------------------------
+python-dotenv>=1.0.0
