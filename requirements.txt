@@ -2,4 +2,7 @@ langchain
 langchain-google-genai
 langgraph
 pydantic
-python-dotenv
+python-dotenvfastapi
+uvicorn
+websockets
+motor
