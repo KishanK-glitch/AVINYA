@@ -2,19 +2,6 @@
 api/websockets.py
 -----------------
 WebSocket endpoint that drives the real-time adaptive-learning loop.
-
-Flow
-----
-1. Client connects to  GET /ws/{session_id}
-2. Server loads the session from MongoDB.
-3. Server delegates every incoming message to the Orchestrator (Kishan's module).
-4. Orchestrator returns a reply which is forwarded back to the client.
-5. The loop continues until the client disconnects or the session ends.
-
-Imports
--------
-The orchestrator is imported from  ml_engine/agents/orchestrator.py
-(resolved via the Python path set in the project root).
 """
 
 import json
@@ -26,18 +13,15 @@ from core.mongo_client import get_sessions_collection
 
 logger = logging.getLogger(__name__)
 
-# Lazy import so the server still starts even if ml_engine isn't installed yet.
+# 1. CORRECT IMPORT: Pull the compiled graph from Kishan's ML engine
 try:
-    from ml_engine.agents.orchestrator import Orchestrator  # type: ignore
-    _ORCHESTRATOR_AVAILABLE = True
+    from ml_engine.agents.orchestrator import app_engine
+    _ENGINE_AVAILABLE = True
 except ImportError:
-    _ORCHESTRATOR_AVAILABLE = False
-    logger.warning(
-        "ml_engine.agents.orchestrator not found – running in STUB mode."
-    )
+    _ENGINE_AVAILABLE = False
+    logger.warning("ml_engine.agents.orchestrator not found – running in STUB mode.")
 
 router = APIRouter()
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -48,26 +32,14 @@ async def _load_session(session_id: str) -> dict | None:
     collection = await get_sessions_collection()
     return await collection.find_one({"session_id": session_id}, {"_id": 0})
 
-
 async def _send_json(ws: WebSocket, payload: dict) -> None:
     await ws.send_text(json.dumps(payload))
-
 
 # ---------------------------------------------------------------------------
 # GET /ws/{session_id}
 # ---------------------------------------------------------------------------
 @router.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
-    """
-    Main WebSocket loop.
-
-    Message protocol (JSON)
-    -----------------------
-    Client → Server : { "type": "user_message", "content": "..." }
-    Server → Client : { "type": "agent_reply",  "content": "...", "agent": "examiner|evaluator|curator" }
-    Server → Client : { "type": "error",         "content": "..." }
-    Server → Client : { "type": "session_end",   "content": "Session complete." }
-    """
     await websocket.accept()
 
     # ---- Validate session ----
@@ -76,12 +48,6 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         await _send_json(websocket, {"type": "error", "content": "Session not found."})
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
-
-    # ---- Instantiate orchestrator ----
-    if _ORCHESTRATOR_AVAILABLE:
-        orchestrator = Orchestrator(session=session)
-    else:
-        orchestrator = None  # Stub mode
 
     await _send_json(
         websocket,
@@ -111,14 +77,41 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
             user_content: str = message.get("content", "")
 
-            # ---- Delegate to Orchestrator ----
-            if orchestrator is not None:
-                # Orchestrator.handle() is expected to be an async generator
-                # that yields partial or complete replies from each agent.
-                async for chunk in orchestrator.handle(user_input=user_content):
-                    await _send_json(websocket, chunk)
+            # ---- Delegate to Kishan's ML Engine ----
+            if _ENGINE_AVAILABLE:
+                # Build the state payload required by the LangGraph engine
+                # WARNING TO LISHAN: You MUST ensure 'syllabus_context' is pulled from Ananya's DB 
+                # and exists in this session object, otherwise the Examiner will hallucinate.
+                engine_state = {
+                    "session_id": session_id,
+                    "current_node_id": session.get("current_node_id", "node_04"),
+                    "node_topic": session.get("topic", "Unknown Topic"),
+                    "node_syllabus_context": session.get("syllabus_context", "Missing ground truth"), 
+                    "user_response": user_content,
+                    "chat_history": []
+                }
+
+                # Run the LangGraph engine asynchronously so it doesn't block FastAPI
+                final_state = await app_engine.ainvoke(engine_state)
+
+                # Route the response back to the frontend based on the Evaluator's decision
+                if final_state.get("is_mastered"):
+                    await _send_json(websocket, {
+                        "type": "agent_reply",
+                        "agent": "evaluator",
+                        "content": "Correct. Node mastered.",
+                        "status": "passed" # Frontend should turn node GREEN
+                    })
+                else:
+                    await _send_json(websocket, {
+                        "type": "agent_reply",
+                        "agent": "curator",
+                        "content": final_state.get("rag_payload", "Failed. Please review the material."),
+                        "status": "failed" # Frontend should turn node RED
+                    })
+
             else:
-                # Stub: echo back with a placeholder agent reply
+                # Stub: echo back if engine isn't mounted
                 await _send_json(
                     websocket,
                     {
