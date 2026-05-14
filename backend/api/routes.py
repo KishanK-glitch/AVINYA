@@ -17,9 +17,9 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, status
 
-from core.mongo_client import get_sessions_collection
-from models.api_schemas import StartSessionRequest, StartSessionResponse
-from models.db_schemas import SessionDocument
+from backend.core.mongo_client import get_sessions_collection
+from backend.models.api_schemas import StartSessionRequest, StartSessionResponse
+from backend.models.db_schemas import SessionDocument
 
 router = APIRouter()
 

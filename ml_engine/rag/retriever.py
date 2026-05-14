@@ -1,4 +1,4 @@
-from rag.reranker import rerank_chunks
+from ml_engine.rag.reranker import rerank_chunks
 
 def fetch_context_for_node(topic: str) -> str:
     """

@@ -13,10 +13,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import router as api_router
-from api.websockets import router as ws_router
-from core.config import settings
-from core.mongo_client import connect_mongo, disconnect_mongo
+from backend.api.routes import router as api_router
+from backend.api.websockets import router as ws_router
+from backend.core.config import settings
+from backend.core.mongo_client import connect_mongo, disconnect_mongo
 
 
 # ---------------------------------------------------------------------------

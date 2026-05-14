@@ -1,12 +1,6 @@
 import json
-import sys
-import os
 
-# Safeguard to ensure FastAPI can find Kishan's ML Engine folder
-# even if Lishan runs the server from a weird directory.
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-
-from ml_engine.agents.orchestrator import SessionState
+from ml_engine.agents.state import SessionState
 from ml_engine.agents.agent_b_evaluator import node_evaluator
 from ml_engine.agents.agent_c_curator import node_curator
 

@@ -9,7 +9,7 @@ import logging
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
-from core.mongo_client import get_sessions_collection
+from backend.core.mongo_client import get_sessions_collection
 
 logger = logging.getLogger(__name__)
 
