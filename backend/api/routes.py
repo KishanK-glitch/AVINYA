@@ -11,7 +11,37 @@ POST /api/session/start
     - Returns the generated session_id so the frontend can
       open a WebSocket connection on /ws/{session_id}.
 """
+# ADD THESE TO THE TOP
+from fastapi import UploadFile, File
+from fastapi.responses import JSONResponse
+import asyncio
 
+# ... keep existing code ...
+
+# ---------------------------------------------------------------------------
+# POST /api/upload_syllabus (HACKATHON MOCK)
+# ---------------------------------------------------------------------------
+@router.post("/upload_syllabus", tags=["REST"])
+async def upload_syllabus(file: UploadFile = File(...)):
+    """
+    HACKATHON MOCK: Simulates PDF processing and returns a GNN node graph.
+    """
+    await asyncio.sleep(1.5) # The "Processing" delay for realism
+    
+    mock_graph_data = {
+        "nodes": [
+            {"id": "1", "position": {"x": 250, "y": 50}, "data": {"label": "Neural Networks", "status": "mastered"}},
+            {"id": "2", "position": {"x": 100, "y": 150}, "data": {"label": "CNN Architecture", "status": "mastered"}},
+            {"id": "3", "position": {"x": 400, "y": 150}, "data": {"label": "Transformers", "status": "pending"}},
+            {"id": "4", "position": {"x": 250, "y": 250}, "data": {"label": "Attention Mechanism", "status": "unlearned"}}
+        ],
+        "edges": [
+            {"id": "e1-2", "source": "1", "target": "2", "animated": True},
+            {"id": "e1-3", "source": "1", "target": "3", "animated": True},
+            {"id": "e2-4", "source": "2", "target": "4"}
+        ]
+    }
+    return JSONResponse(content=mock_graph_data)
 import uuid
 from datetime import datetime, timezone
 
