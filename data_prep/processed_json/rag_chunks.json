@@ -1,0 +1,98 @@
+[
+  {
+    "node_id": "node_01",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Vector Embeddings"
+    },
+    "content": "Vector embeddings are dense, continuous vector representations of discrete tokens. In a transformer, the input text is first tokenized and then mapped to these high-dimensional continuous spaces so that words with similar meanings have similar representations. This forms the foundational input layer before any attention mechanism is applied."
+  },
+  {
+    "node_id": "node_02",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Query, Key, and Value Vectors"
+    },
+    "content": "In self-attention, every input embedding is multiplied by three distinct learned weight matrices to produce three new vectors: a Query vector (Q), a Key vector (K), and a Value vector (V). The Query represents what the token is looking for, the Key represents what the token contains, and the Value represents the actual underlying information."
+  },
+  {
+    "node_id": "node_03",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Dot Product Similarity"
+    },
+    "content": "To determine how much focus one token should place on another, the model calculates the dot product between the Query vector of the current token and the Key vectors of all other tokens in the sequence. A higher dot product indicates a stronger alignment or similarity between the query and the key."
+  },
+  {
+    "node_id": "node_04",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Scaled dot-product attention"
+    },
+    "content": "Scaled dot-product attention takes the dot products of the Queries and Keys and divides them by the square root of the dimension of the key vectors (sqrt(d_k)). This scaling factor is critical because it prevents the dot products from growing too large, which would push the subsequent softmax function into regions with extremely small gradients, effectively stalling the learning process."
+  },
+  {
+    "node_id": "node_05",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "The Softmax Function"
+    },
+    "content": "The softmax function is a mathematical operation applied to the scaled dot products. It converts these raw similarity scores into a probability distribution, ensuring that all scores are positive and sum exactly to 1.0. This makes the scores interpretable as fractional weights."
+  },
+  {
+    "node_id": "node_06",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Attention Weights Application"
+    },
+    "content": "Once the softmax function generates the normalized attention weights, these weights are multiplied by the Value (V) matrices. This step dictates how much of each token's actual content (its Value) should be kept. Tokens with high attention weights contribute heavily to the final output vector, while irrelevant tokens are filtered out."
+  },
+  {
+    "node_id": "node_07",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Multi-Head Attention"
+    },
+    "content": "Multi-head attention runs the scaled dot-product attention mechanism multiple times in parallel, using different, independently learned weight matrices for Q, K, and V. This allows the model to simultaneously attend to different types of relationships (e.g., grammatical structure in one head, semantic meaning in another) at different positions."
+  },
+  {
+    "node_id": "node_08",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Concatenation and Linear Projection"
+    },
+    "content": "After all parallel attention heads have computed their individual output vectors, these vectors are concatenated together into a single large vector. This concatenated matrix is then multiplied by a final learned weight matrix (W_O) to project it back down to the expected hidden dimension size of the transformer layer."
+  },
+  {
+    "node_id": "node_09",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Look-Ahead Masking"
+    },
+    "content": "In autoregressive generation tasks, masked self-attention is used to prevent the model from 'cheating' by looking at future tokens. This is achieved by applying a mask matrix that sets the upper triangular elements of the QK^T matrix to negative infinity before the softmax step, forcing the attention weights for future tokens to zero."
+  },
+  {
+    "node_id": "node_10",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Padding Masking"
+    },
+    "content": "Padding masks are used when processing batches of sequences of different lengths. Shorter sequences are padded with special tokens to match the longest sequence. The padding mask ensures that the attention mechanism does not assign any weight or focus to these meaningless padding tokens during computation."
+  },
+  {
+    "node_id": "node_11",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Positional Encoding"
+    },
+    "content": "Because the self-attention mechanism itself contains no recurrence and no convolution, it inherently lacks any concept of word order. Positional encoding injects sequence information by adding sine and cosine functions of varying frequencies directly into the input embeddings, allowing the model to determine the relative distance between tokens."
+  },
+  {
+    "node_id": "node_12",
+    "metadata": {
+      "topic": "Transformer attention mechanism",
+      "sub_concept": "Position-wise Feed-Forward Networks"
+    },
+    "content": "Following the multi-head attention sub-layer, the output is passed through a position-wise feed-forward network (FFN). This consists of two linear transformations with a ReLU activation in between. It is applied independently and identically to every position in the sequence, introducing non-linearity and further processing the attended representations."
+  }
+]

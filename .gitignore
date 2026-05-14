@@ -1,21 +1,10 @@
 # AVINYA PROJECT .gitignore
-
-# Environments
 .env
 venv/
-env/
-__pycache__/
+_pycache_/
 *.pyc
-
-# IDEs
 .vscode/
-.idea/
 
-# Data Prep (Ananya's local heavy files)
-# Do not push massive PDFs or local Qdrant storage to Git
-data_prep/raw_content/*.pdf
-qdrant_storage/
-
-# OS Files
-.DS_Store
-Thumbs.db
+# Ananya's Data Prep Exclusions
+data_prep/raw_content/
+qdrant_local/
