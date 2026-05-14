@@ -48,3 +48,13 @@ def build_engine():
 
 # Export the compiled graph
 app_engine = build_engine()
+# In orchestrator.py
+class SessionState(TypedDict, total=False):
+    # ... keep your existing fields ...
+    session_id: str
+    current_node_id: str
+    # ...
+    
+    # Add these two new fields:
+    agent_error: bool
+    error_message: str
