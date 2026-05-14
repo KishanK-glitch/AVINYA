@@ -7,4 +7,4 @@ _pycache_/
 
 # Ananya's Data Prep Exclusions
 data_prep/raw_content/
-data_prep/qdrant_local/
+qdrant_local/
